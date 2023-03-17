@@ -3,6 +3,7 @@ const app = express();
 
 console.log('S');
 console.log('S');
+console.log('6');
 
 app.get('/', (req, res) => {
 
