@@ -1,1 +1,0 @@
-console.log('vadim.js from \'vadim\' branch')
