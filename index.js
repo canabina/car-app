@@ -3,6 +3,7 @@ const app = express();
 
 console.log('S');
 console.log('S');
+console.log('6');
 
 app.get('/', (req, res) => {
 
@@ -20,6 +21,7 @@ app.get('/vad', (req, res) => {
 });
 
 console.log('bottom changes');
+console.log('bottom changes 2');
 
 app.listen(4000);
 
