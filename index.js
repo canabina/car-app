@@ -18,4 +18,6 @@ app.get('/vad', (req, res) => {
     res.send('<h1>Vad!</h1>');
 });
 
+console.log('bottom changes');
+
 app.listen(4000);
