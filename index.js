@@ -1,32 +1,50 @@
 const express = require('express');
 const app = express();
+var cors = require('cors');
+var bodyParser = require('body-parser');
 
-console.log('S');
-console.log('S');
-console.log('S');
-console.log('6');
+const connection = require('./db.js');
+app.use(cors());
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
 
-app.get('/', (req, res) => {
+// parse application/json
+app.use(bodyParser.json())
 
-    res.send('Hello');
-});
+app.get('/get-cars', (req, res) => {
+    connection.query(
+        'SELECT * FROM `cars`',
+        function(err, results) {
+           // res.send(results); // results contains rows returned by server
+            let html = results.map((car)=> {
+                return car.brand+' '+car.model+' '+car.stock_count;
+            }).join('<br/>');
+            res.send(html);
+        }
+    );
+})
 
-app.get('/', (req, res) => {
+app.get('/get-car/:id', (req, res) => {
+    connection.query(
+        `SELECT * FROM cars WHERE id = ${req.params.id}`,
+        function(err, results) {
+            // res.send(results); // results contains rows returned by server
+            let html = results.map((car)=> {
+                return car.brand+' '+car.model+' '+car.stock_count;
+            }).join('<br/>');
+            res.send(html);
+        }
+    );
+})
 
-    res.send('Hello' + req + '.');
-});
-
-app.get('/vad', (req, res) => {
-
-    res.send('<h1>Vad!</h1>');
-});
-
-console.log('bottom changes');
-console.log('bottom changes 2');
+app.post('/update-car', (req, res) => {
+    connection.query(
+        `UPDATE cars SET brand = '${req.body.name}' WHERE id = ${req.body.id}`,
+        function(err, results) {
+            // res.send(results); // results contains rows returned by server
+            return res.send('OK!');
+        }
+    );
+})
 
 app.listen(4000);
-
-
-
-console.log('S');
-console.log('S');
