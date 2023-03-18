@@ -1,19 +1,30 @@
 <html>
 <body>
+
+<div class="cars">
+
+</div>
+<input id="showCars" type="button" value="Show cars">
+<br>
 <div>
     <input id="fid" type="number" placeholder="ID ">
     <input id="fname" type="text" placeholder="NAME ">
     <input id="fsubmit" type="button" value="SUBMIT!!!">
 </div>
+
+
+
 <script>
     const fsubmit = document.querySelector('#fsubmit');
     const fname = document.querySelector('#fname');
     const fid = document.querySelector('#fid');
+    const cars = document.querySelector('.cars');
+    const showCars = document.querySelector('#showCars');
+
+
     fsubmit.addEventListener('click', async (event)=> {
         event.preventDefault();
-        console.log(
-            'preventDefault fired1'
-        )
+
         const rawResponse = await fetch('http://localhost:4000/update-car', {
             method: 'POST',
             headers: {
@@ -25,7 +36,15 @@
                 name: fname.value
             })
         });
-    })
+
+        showCar();
+    });
+
+    showCars.addEventListener('click', showCar);
+    async function showCar() {
+        const rawResponse = await fetch('http://localhost:4000/get-cars');
+        cars.innerHTML = await rawResponse.text();
+    }
 
 
 </script>
