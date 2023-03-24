@@ -1,0 +1,31 @@
+.page {
+    justify-content: center;
+    flex-direction: row;
+    text-align: center;
+    display: flex;
+    /*width: 50%;*/
+}
+
+.message {
+    opacity: 0;
+}
+
+.show {
+    opacity: 1;
+    color: red;
+    font-size: 25px;
+}
+
+.page input, h1 {
+    margin-bottom: 10px;
+}
+.page input, h1 {
+    margin-bottom: 10px;
+}
+.page-content {
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    display: flex;
+    width: 50%;
+}

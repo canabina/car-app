@@ -1,32 +1,43 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const connection = require('./db.js');
+const { v4: uuidv4 } = require('uuid');
 
-console.log('S');
-console.log('S');
-console.log('S');
-console.log('6');
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(cors());
 
-app.get('/', (req, res) => {
+const sessions = {};
 
-    res.send('Hello');
+app.post('/auth', (req, res) => {
+
+    const login = req.body.login;
+    const password = req.body.password;
+
+    connection.query(
+        `SELECT * FROM users WHERE login = "${login}" AND password = "${password}" LIMIT 1`,
+        (err, result) => {
+            const user = result[0];
+            if (user) {
+
+                const token = uuidv4();
+                sessions[user.id] = token;
+
+                res.send({
+                    status: 'OK',
+                    message: "Success login",
+                    token
+                });
+            } else {
+                res.send({
+                    status: 'ERROR',
+                    message: 'Invalid login or pass'
+                });
+            }
+        }
+    );
 });
-
-app.get('/', (req, res) => {
-
-    res.send('Hello' + req + '.');
-});
-
-app.get('/vad', (req, res) => {
-
-    res.send('<h1>Vad!</h1>');
-});
-
-console.log('bottom changes');
-console.log('bottom changes 2');
 
 app.listen(4000);
-
-
-
-console.log('S');
-console.log('S');
