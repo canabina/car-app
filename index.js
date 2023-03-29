@@ -17,13 +17,13 @@ app.post('/auth', (req, res) => {
     const password = req.body.password;
 
     connection.query(
-        `SELECT * FROM users WHERE login = "${login}" AND password = "${password}" LIMIT 1`,
+        `SELECT *  FROM users WHERE login = "${login}" AND password = "${password}" LIMIT 1`,
         (err, result) => {
             const user = result[0];
             if (user) {
-
                 const token = uuidv4();
-                sessions[user.id] = token;
+                sessions[user.id] =
+                    token;
 
                 res.send({
                     status: 'OK',
