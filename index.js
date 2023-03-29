@@ -40,4 +40,24 @@ app.post('/auth', (req, res) => {
     );
 });
 
+app.get ('/check-token', (req, res) =>{
+
+    const tokenIsValid = Object.values(sessions).includes(req.headers.apitoken);
+
+    if (tokenIsValid) {
+        res.send({
+            status: 'OK',
+            message: "Token is valid"
+        })
+    } else {
+        res.send({
+            status: 'ERROR',
+            message: 'Invalid token'
+        });
+    }
+    // status OK + msg success login
+    // status error + msg token is invalid
+})
+
+
 app.listen(4000);
