@@ -59,5 +59,23 @@ app.get ('/check-token', (req, res) =>{
     // status error + msg token is invalid
 })
 
+app.get('/log-out', (req, res) => {
+    for (let userIdKey in sessions) {
+        const value = sessions[userIdKey];
+        if (value === req.headers.apitoken) {
+            delete sessions[userIdKey];
+            return res.send({
+                status: 'OK',
+                message: "secsess logout"
+            })
+
+        }
+    }
+    res.send({
+        status: 'error',
+        message: "invalid token"
+    })
+
+})
 
 app.listen(4000);
