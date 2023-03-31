@@ -78,4 +78,42 @@ app.get('/log-out', (req, res) => {
 
 })
 
+app.get('/getcars', (req, res) => {
+
+    const limit = Number(req.query.limit || 5 )
+    const offset = ( Number(req.query.page || 1) - 1) * limit
+    const brand = req.query.brand
+    const model = req.query.model
+    const type = req.query.type
+    const arr = [1]
+
+    if(brand) {
+        arr.push(`brand = "${brand}"`)
+    }
+    if(model) {
+        arr.push(`model = "${model}"`)
+    }
+    if(type) {
+        arr.push(`type = "${type}"`)
+    }
+
+    let where = ` WHERE ${arr.join(" AND ")} `
+    const sql = ` 
+ SELECT * 
+ FROM carsstock
+ ${where}
+ LIMIT ${offset}, ${limit} `
+
+    connection.query(sql,
+        (err, result) => {
+            res.send({
+                data: result.map( (item) => {
+                    item.brandAndmodel = `${item.brand} ${item.model}`
+                    return item.brandAndmodel
+                })
+            })
+        }
+    )
+} )
+
 app.listen(4000);
