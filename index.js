@@ -4,6 +4,10 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const connection = require('./db.js');
 const { v4: uuidv4 } = require('uuid');
+const fs = require('fs');
+const request = require('request');
+const helperjs = require('./helper.js');
+
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -115,5 +119,92 @@ app.get('/getcars', (req, res) => {
         }
     )
 } )
+
+function parse(string) {
+    const [header, ...values] = string.split('\n');
+    const headerValues = header.split(',');
+
+    return values.map(value => {
+        const valueSeparate = value.split(',');
+        return Object.fromEntries(valueSeparate.map((item, index) => [headerValues[index], item]));
+    })
+}
+
+app.get('/get-prices-promises', async (req,res) => {
+    const currencyType = req.query.currency;
+    const sqlQuery = `
+    SELECT *
+    FROM 
+    cars2
+    `;
+/*
+    const [
+        DBResult,
+        CSVFile,
+        RequestCurrency
+    ] = await Promise.all([
+        helperjs.DBPromise(sqlQuery),
+        helperjs.readFilePromise('./stock.csv'),
+        helperjs.requestPromise('http://www.floatrates.com/daily/eur.json')
+    ])*/
+    const DBResult = await helperjs.DBPromise(sqlQuery);
+    const CSVFile = await helperjs.readFilePromise('./stock.csv');
+    const RequestCurrency = await helperjs.requestPromise('http://www.floatrates.com/daily/eur.json');
+    let stockCsv = parse(CSVFile);
+    let currencies = JSON.parse(RequestCurrency.body);
+    let currency = currencies[currencyType];
+    const result = DBResult.map((item)=>{
+        item[`price_${currencyType}`] = currency.rate * item.price;
+        let stock = stockCsv.find((csvItem)=>{
+            return csvItem.id == item.id;
+        })
+
+        item[`priceTotal`] = item[`price_${currencyType}`] * stock.stock;
+        item['amountInStock'] = stock.stock;
+        return item;
+    })
+
+    res.send({
+        result
+    })
+
+
+})
+/*
+app.get('/get-prices', (req,res)=> {
+    const currencyType = req.query.currency;
+    const sqlQuery = `
+    SELECT *
+    FROM 
+    cars2
+    `;
+
+
+    connection.query(sqlQuery, (dbError,dbResult) => {
+
+        fs.readFile('./stock.csv', 'utf-8', (fileError, fileResult) => {
+            request('http://www.floatrates.com/daily/eur.json', function (currencyError, currencyResponse) {
+                let stockCsv = parse(fileResult);
+                let currencies = JSON.parse(currencyResponse.body);
+                let currency = currencies[currencyType];
+                const result = dbResult.map((item)=>{
+                    item[`price_${currencyType}`] = currency.rate * item.price;
+                    let stock = stockCsv.find((csvItem)=>{
+                        return csvItem.id == item.id;
+                    })
+
+                    item[`priceTotal`] = item[`price_${currencyType}`] * stock.stock;
+                    item['amountInStock'] = stock.stock;
+                    return item;
+                })
+
+                res.send({
+                   result
+                })
+            });
+
+        })
+    })
+})*/
 
 app.listen(4000);
