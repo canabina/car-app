@@ -284,6 +284,21 @@ app.get(`/add-car`, (req, res) => {
     )
 })
 
+app.get('/converter', async (req, res) => {
+    let value = req.query.value;
+    let currIn = req.query.currencyIn;
+    let currOut = req.query.currencyOut;
+
+    const RequestCurrency = await helperjs.requestPromise('http://www.floatrates.com/daily/eur.json');
+    const currencies = JSON.parse(RequestCurrency.body);
+
+    value = (Number(value) * currencies[currIn].inverseRate) * currencies[currOut].rate;
+
+    res.send(value.toString());
+
+
+})
+
 app.listen(4000);
 
 
