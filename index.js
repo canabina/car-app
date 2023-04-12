@@ -78,4 +78,84 @@ app.get('/log-out', (req, res) => {
 
 })
 
+app.get('/get-cars', (req, res) => {
+    const ofSet = (req.query.page - 1) * req.query.limit;
+    const limit = req.query.limit;
+    const sql = `SELECT * FROM cars_stock LIMIT ${ofSet}, ${limit}`;
+    connection.query(
+        sql,
+        function (err, result ) {
+            res.send(result);
+        }
+    )
+
+});
+
+app.get('/delete-car', (req, res) => {
+    const idCar = req.query.id,
+    deleteCar = `DELETE FROM cars_stock WHERE id = ${idCar}`;
+    connection.query(
+        deleteCar,
+        (err, result) => {
+            (err) ? res.send(err) : res.send(result);
+        }
+    )
+})
+
+
+app.get(`/update-car`, (req, res) => {
+    const id = req.query.id,
+        brand = req.query.brand,
+        model = req.query.model,
+        color = req.query.color;
+
+    if (!id) {
+        return res.send("miss id");
+    }
+    if (!brand && !brand && !color) {
+        return res.send("miss brand, color, model");
+    }
+    let arr = [];
+    if (brand) {
+     arr.push(`brand = "${brand}"`);
+    }
+    if (model) {
+        arr.push(`model = "${model}"`);
+    }
+    if (color) {
+        arr.push(`color = "${color}"`);
+    }
+
+    const car = `UPDATE cars_stock SET ${arr.join(',')} WHERE id IN (${id})`;
+    connection.query(
+        car,
+        (err, result) => {
+            (err) ? res.send(err) : res.send(result);
+        }
+
+    )
+})
+
+app.get(`/add-car`, (req, res) => {
+
+        const brand = req.query.brand,
+        model = req.query.model,
+        color = req.query.color,
+        type = req.query.type,
+        stock = req.query.stock,
+        engineId = req.query.engine_id;
+
+    const addCar = `INSERT INTO cars_stock SET brand = "${brand}", model = "${model}", color = "${color}", type = "${type}", stock = "${stock}", engine_id = "${engineId}"`
+    connection.query(
+        addCar,
+        (err, result) => {
+            (err) ? res.send(err) : res.send(result);
+        }
+
+    )
+})
+
 app.listen(4000);
+
+
+
